@@ -3,6 +3,17 @@ import sys
 import os
 import time
 from subprocess import Popen, PIPE
+from optparse import OptionParser
+
+
+defaultRemoteIp = '172.16.11.20'
+parser = OptionParser()
+parser.add_option('-s', '--serverip', dest="serverIp",
+                    help="remote tftp serverIp, default is %s" % defaultRemoteIp)
+parser.add_option('-p', '--serverScriptsPath', dest='serverScriptsPath',
+                    help="""remote server scripts addresss like          \n
+h01p55r-release-00.02/H01P55R-00.02.13-1532204-11/helios/scripts/""")
+
 
 curDir = os.path.abspath('.')
 
@@ -28,14 +39,14 @@ def get_IP():
     return ip
 
 
-def mstarCommand(factorytftpIP, servertftpAddr, serverIp='172.16.11.20'):
+def mstarCommand(factorytftpIP, serverScriptsPath, serverIp):
     """
     factorytftp: factoryimg tftp IP
-    servertftpAddr: remote img folder addresss like below
+    serverScriptsPath: remote server scripts addresss like below
             'h01p55r-release-00.02/H01P55R-00.02.13-1532204-11/helios/scripts/'
     """
     factoryTftpPath = 'scripts/[[factory'
-    remotePath = servertftpAddr
+    remotePath = serverScriptsPath
     command_List = []
     command_List.append('mmc erase.boot 2 0 512')
     command_List.append('mmc erase')
@@ -48,16 +59,26 @@ def mstarCommand(factorytftpIP, servertftpAddr, serverIp='172.16.11.20'):
     return command_List
 
 
-def create_Script(command_List):
-    command_Str = ''
-    for c in command_List:
-        command_Str += c + '\n'
+def comList2Str(command_List):
+    return '\n'.join(command_List)
+
+def create_Script(commandstr):
     filePath = os.path.join(curDir, 'mupianScript')
     try:
         with open(filePath, mode='w+') as f:
-            f.write(command_Str)
+            f.write(commandstr)
     except StandardError, e:
         print e
 
-com = mstarCommand(get_IP(), 'h01p55r-release-00.02/H01P55R-00.02.13-1532204-11/helios/')
-create_Script(com)
+(options, args) = parser.parse_args()
+
+if options.serverIp is None:
+    options.serverIp = defaultRemoteIp
+
+if options.serverScriptsPath is None:
+    parser.error('need input remote scripts addresss')
+
+if __name__ == '__main__':
+    com = mstarCommand(get_IP(), options.serverScriptsPath, options.serverIp)
+    print '\n'.join(com)
+    create_Script('\n'.join(com))

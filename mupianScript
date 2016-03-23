@@ -2,7 +2,7 @@ mmc erase.boot 2 0 512
 mmc erase
 mmc write.p 0x20200000 MBOOT $(filesize)
 set serverip 172.16.11.20
-mstar h01p55r-release-00.02/H01P55R-00.02.13-1532204-11/helios/scripts/set_partition
+mstar h01p55r-release-00.02/H01P55R-00.02.13-1532204-11/helios/scripts/scripts/set_partition
 set serverip 172.16.105.129
 mstar scripts/[[factory
-mstar h01p55r-release-00.02/H01P55R-00.02.13-1532204-11/helios/scripts/[[mboot
+mstar h01p55r-release-00.02/H01P55R-00.02.13-1532204-11/helios/scripts/scripts/[[mboot
