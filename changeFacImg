@@ -1,0 +1,33 @@
+if [ "$#" == '2' ]; then
+	echo "开始处理..."
+else 
+	echo "参数错误，请依次输入index和product"
+	exit 1
+fi
+
+echo "************remove factory dir first************"
+rm -rf factory
+echo "************create factory dir************"
+mkdir -m 0755 factory
+
+echo "************mount img************"
+mount factory.img factory/
+
+echo "************write information into factory************"
+echo $1 > ./factory/model_index.ini
+echo $1 > ./factory/panel_index.ini
+echo "ro.product.model2=$2" > ./factory/factory.prop 
+
+echo "model_index.ini ===> \"$(cat ./factory/model_index.ini)\""
+echo "panel_index.ini ===> \"$(cat ./factory/panel_index.ini)\""
+echo "factory.prop ===> \"$(cat ./factory/factory.prop)\""
+
+echo "************chang file umask************"
+chmod 0644 ./factory/model_index.ini
+chmod 0644 ./factory/panel_index.ini
+chmod 0644 ./factory/factory.prop
+
+ls -al  ./factory
+
+echo "************umount img************"
+umount factory.img                                                                                                                          
